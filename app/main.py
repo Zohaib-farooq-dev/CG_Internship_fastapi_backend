@@ -1,7 +1,14 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from app.routers import patient_router
+from app.core.database import Base, engine
+from app.routers.patient_router import router as patient_router
 
-app = FastAPI(title="Patient API")
 
-# include patient router
-app.include_router(patient_router.router)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print('new tables created')
+    Base.metadata.create_all(bind=engine)
+    yield  
+
+app = FastAPI(lifespan=lifespan)
+app.include_router(patient_router)

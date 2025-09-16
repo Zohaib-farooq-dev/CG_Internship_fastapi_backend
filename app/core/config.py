@@ -1,7 +1,9 @@
-# app/core/config.py
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    data_file: str = "patients.json"
+    DATABASE_URL: str # default local sqlite
+    # agar .env use kar rahe ho:
+    class Config:
+        env_file = ".env"
 
 settings = Settings()
