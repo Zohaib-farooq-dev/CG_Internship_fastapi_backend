@@ -1,3 +1,9 @@
+"""
+Database configuration and session management.
+
+Creates the SQLAlchemy engine, session factory, and base model class,
+and provides a dependency to yield a database session per request.
+"""
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from app.core.config import settings

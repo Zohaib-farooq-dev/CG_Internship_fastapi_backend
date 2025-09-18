@@ -1,3 +1,9 @@
+"""
+Database models for patient records.
+
+Defines the Patient ORM model representing the 'patients' table,
+including columns for personal info, physical measurements, and BMI verdict.
+"""
 from sqlalchemy import Column, String, Integer, Float, Enum
 from app.core.database import Base
 import enum

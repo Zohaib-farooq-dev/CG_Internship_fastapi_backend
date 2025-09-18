@@ -1,3 +1,14 @@
+"""
+Pydantic models for patient data validation and API I/O schemas.
+
+This module defines:
+- Patient: Full patient schema with validation, example values, and computed fields 
+  (BMI and health verdict) derived automatically from height and weight.
+- PatientUpdate: Partial schema for updating existing patient records with optional fields.
+
+These models ensure strict type checking, input validation, and automatic 
+calculation of derived attributes when used in FastAPI endpoints.
+"""
 from pydantic import BaseModel, Field, computed_field
 from typing import Annotated, Literal, Optional
 
