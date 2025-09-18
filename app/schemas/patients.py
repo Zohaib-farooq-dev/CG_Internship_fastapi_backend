@@ -12,7 +12,7 @@ calculation of derived attributes when used in FastAPI endpoints.
 from pydantic import BaseModel, Field, computed_field
 from typing import Annotated, Literal, Optional
 
-class Patient(BaseModel):
+class PatientBase(BaseModel):
     id: Annotated[str,Field(...,description='Id of the patient',example='P001')]
     name:Annotated[str,Field(...,description='Name of the patient')]
     city:Annotated[str,Field(...,description='City where the patient is living')]
@@ -36,6 +36,16 @@ class Patient(BaseModel):
             return 'Normal'
         else:
             return 'Obese'
+        
+
+class PatientCreate(PatientBase):
+    doctor_id: Annotated[int, Field(..., description="ID of the doctor assigned to this patient")]
+
+class PatientResponse(PatientBase):
+    doctor_id: int
+
+    class Config:
+        from_attributes = True   
 
 class PatientUpdate(BaseModel):
     name: Annotated[Optional[str], Field(default=None)]
@@ -44,3 +54,4 @@ class PatientUpdate(BaseModel):
     gender: Annotated[Optional[Literal['male', 'female']], Field(default=None)]
     height: Annotated[Optional[float], Field(default=None, gt=0)]
     weight: Annotated[Optional[float], Field(default=None, gt=0)]
+    doctor_id: Annotated[Optional[int], Field(default=None,gt =0)]

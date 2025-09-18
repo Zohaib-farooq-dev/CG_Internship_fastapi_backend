@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, Path, Query, status
-from sqlalchemy.orm import Session
-from app.schemas.patients import Patient, PatientUpdate   #  create ke liye alag schema
+from sqlalchemy.orm import Session # type: ignore
+from app.schemas.patients import PatientUpdate,PatientCreate,PatientResponse  #  create ke liye alag schema
 from app.services import patient_service
 from app.core.database import get_db  # DB dependency
 
-router = APIRouter()
+router = APIRouter(tags=['Patients'])
 
 @router.get("/")
 def hello():
@@ -33,7 +33,7 @@ def view(db: Session = Depends(get_db)):   # DB session inject
     """
     return patient_service.view(db)
 
-@router.get("/patient/{patient_id}")
+@router.get("/patient/{patient_id}",response_model=PatientResponse)
 def view_patient(
     patient_id: str = Path(..., description="ID of the patient", example="P001"),
     db: Session = Depends(get_db)
@@ -48,7 +48,7 @@ def view_patient(
     """
     return patient_service.view_patient(db, patient_id)
 
-@router.get("/sort")
+@router.get("/sort",response_model=PatientResponse)
 def sorted_patients(
     sort_by: str = Query("weight", description="Sort by weight, height or bmi"),
     order: str = Query("asc", description="asc or desc"),
@@ -66,7 +66,7 @@ def sorted_patients(
     return patient_service.sorted_patients(db, sort_by, order)
 
 @router.post("/create",status_code = status.HTTP_201_CREATED)
-def create(patient: Patient, db: Session = Depends(get_db)):
+def create(patient: PatientCreate, db: Session = Depends(get_db)):
     """
     Endpoint: POST /create
     Receives follwoing arguments and pass them to create_patient() method in service layer.

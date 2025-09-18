@@ -4,7 +4,8 @@ Database models for patient records.
 Defines the Patient ORM model representing the 'patients' table,
 including columns for personal info, physical measurements, and BMI verdict.
 """
-from sqlalchemy import Column, String, Integer, Float, Enum
+from sqlalchemy import Column, String, Integer, Float, Enum, ForeignKey # type: ignore
+from sqlalchemy.orm import relationship # type: ignore
 from app.core.database import Base
 import enum
 
@@ -26,3 +27,6 @@ class Patient(Base):
     weight = Column(Float, nullable=False)   # kgs
     bmi = Column(Float, nullable=True)
     verdict = Column(String, nullable=True)
+    doctor_id = Column(Integer, ForeignKey("doctors.id")) 
+
+    doctor = relationship("Doctor", back_populates="patients")

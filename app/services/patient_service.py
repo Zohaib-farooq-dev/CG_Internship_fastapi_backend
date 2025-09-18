@@ -1,8 +1,8 @@
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session # type: ignore
 from app.models.patient_models import Patient as PatientDB   # SQLAlchemy model
-from app.schemas.patients import Patient, PatientUpdate
+from app.schemas.patients import PatientCreate, PatientUpdate
 
 def view(db: Session)->list[PatientDB]:
     """Return a list of all patients from the database.
@@ -64,7 +64,7 @@ def sorted_patients(db: Session, sort_by: str, order: str)->list[PatientDB]:
         query = query.order_by(column.asc())
     return query.all()
 
-def create_patient(db: Session, patient: Patient)->dict:
+def create_patient(db: Session, patient: PatientCreate)->dict:
     """
     Create a new patient record.
 
@@ -93,7 +93,8 @@ def create_patient(db: Session, patient: Patient)->dict:
         height=patient.height,
         weight=patient.weight,
         bmi=patient.bmi,            # computed_field se direct
-        verdict=patient.verdict     # computed_field se direct
+        verdict=patient.verdict,     # computed_field se direct
+        doctor_id = patient.doctor_id
     )
     db.add(db_patient)
     db.commit()
