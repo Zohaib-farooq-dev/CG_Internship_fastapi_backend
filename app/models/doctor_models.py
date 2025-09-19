@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer, String # pyright: ignore[reportMissingImports]
-from sqlalchemy.orm import relationship # type: ignore
+from sqlalchemy import Column, Integer, String, ForeignKey # pyright: ignore[reportMissingImports]
+from sqlalchemy.orm import relationship  # type: ignore
 from app.core.database import Base
 
 class Doctor(Base):
@@ -8,5 +8,3 @@ class Doctor(Base):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
-
-    patients = relationship("Patient", back_populates="doctor") 

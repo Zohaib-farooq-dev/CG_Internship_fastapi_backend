@@ -6,3 +6,6 @@ env/
 venv/
 .venv/
 .env
+
+#database
+patients.db
