@@ -17,6 +17,10 @@ class DoctorBase(BaseModel):
 class DoctorCreate(DoctorBase):
     password: str  # plain password for creation
 
+class DoctorLogin(BaseModel):
+    username: EmailStr
+    password: str 
+
 class DoctorResponse(DoctorBase):
     id: int
     patients: List[PatientBase] = []

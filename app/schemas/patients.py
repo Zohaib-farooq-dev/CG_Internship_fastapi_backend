@@ -39,7 +39,7 @@ class PatientBase(BaseModel):
         
 
 class PatientCreate(PatientBase):
-    doctor_id: Annotated[int, Field(..., description="ID of the doctor assigned to this patient")]
+    pass
 
 class PatientResponse(PatientBase):
     doctor_id: int

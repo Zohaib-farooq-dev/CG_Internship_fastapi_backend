@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session # type: ignore
 from app.models.doctor_models import Doctor as doctordb  # SQLAlchemy model
 from app.schemas.doctor import DoctorCreate
-from app.utils.hashing import hash_password
+from app.core.security import hash_password
 
 def get(db: Session):
     """Return a list of all doctors from the database.

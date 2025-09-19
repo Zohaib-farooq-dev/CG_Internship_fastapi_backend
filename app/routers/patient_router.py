@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session # type: ignore
 from app.schemas.patients import PatientUpdate,PatientCreate,PatientResponse  #  create ke liye alag schema
 from app.services import patient_service
 from app.core.database import get_db  # DB dependency
+from app.core.security import get_current_doctor_id
 
 router = APIRouter(tags=['Patients'])
 
@@ -23,7 +24,7 @@ def about():
     return {"message": "Fully functional API for managing your patients"}
 
 @router.get("/view")
-def view(db: Session = Depends(get_db)):   # DB session inject
+def view(db: Session = Depends(get_db),doctor_id: int = Depends(get_current_doctor_id)):   # DB session inject
     """
     Endpoint: GET /view
     Fetches all patients from the database by calling the service layer.
@@ -31,12 +32,12 @@ def view(db: Session = Depends(get_db)):   # DB session inject
     Args:
         db (Session): Database session injected via dependency.
     """
-    return patient_service.view(db)
+    return patient_service.view(db,doctor_id)
 
 @router.get("/patient/{patient_id}",response_model=PatientResponse)
 def view_patient(
     patient_id: str = Path(..., description="ID of the patient", example="P001"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),doctor_id: int = Depends(get_current_doctor_id)
 ):
     """
     Endpoint: GET /patient/{patient_id}
@@ -46,13 +47,13 @@ def view_patient(
         patient_id (str): Unique ID of the patient.
         db (Session): Database session.
     """
-    return patient_service.view_patient(db, patient_id)
+    return patient_service.view_patient(db, patient_id,doctor_id)
 
 @router.get("/sort",response_model=PatientResponse)
 def sorted_patients(
     sort_by: str = Query("weight", description="Sort by weight, height or bmi"),
     order: str = Query("asc", description="asc or desc"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db), doctor_id: int = Depends(get_current_doctor_id)
 ):
     """
     Endpoint: GET /sort
@@ -63,10 +64,11 @@ def sorted_patients(
         order (str): Sort order (asc or desc).
         db (Session): Database session.
     """
-    return patient_service.sorted_patients(db, sort_by, order)
+    return patient_service.sorted_patients(db, sort_by, order,doctor_id)
 
 @router.post("/create",status_code = status.HTTP_201_CREATED)
-def create(patient: PatientCreate, db: Session = Depends(get_db)):
+def create(patient: PatientCreate, db: Session = Depends(get_db),doctor_id: int = Depends(get_current_doctor_id)):
+    
     """
     Endpoint: POST /create
     Receives follwoing arguments and pass them to create_patient() method in service layer.
@@ -75,13 +77,14 @@ def create(patient: PatientCreate, db: Session = Depends(get_db)):
         patient (Patient): Pydantic model containing patient data.
         db (Session): Database session.
     """
-    return patient_service.create_patient(db, patient)
+    return patient_service.create_patient(db, patient,doctor_id)
 
 @router.put("/edit/{patient_id}",status_code=status.HTTP_204_NO_CONTENT)
 def update(
     patient_id: str,
     patient: PatientUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    doctor_id: int = Depends(get_current_doctor_id)
 ):
     """
     Endpoint: PUT /edit/{patient_id}
@@ -92,10 +95,10 @@ def update(
         patient (PatientUpdate): Partial patient update data.
         db (Session): Database session.
     """
-    return patient_service.update_patient(db, patient_id, patient)
+    return patient_service.update_patient(db, patient_id, patient,doctor_id)
 
 @router.delete("/delete/{patient_id}")
-def delete(patient_id: str, db: Session = Depends(get_db)):
+def delete(patient_id: str, db: Session = Depends(get_db),doctor_id: int = Depends(get_current_doctor_id)):
     """
     Endpoint: DELETE /delete/{patient_id}
     Receives follwoing arguments and pass them to patient_delete() method in service layer.
@@ -104,4 +107,4 @@ def delete(patient_id: str, db: Session = Depends(get_db)):
         patient_id (str): ID of the patient to delete.
         db (Session): Database session.
     """
-    return patient_service.patient_delete(db, patient_id)
+    return patient_service.patient_delete(db, patient_id,doctor_id)

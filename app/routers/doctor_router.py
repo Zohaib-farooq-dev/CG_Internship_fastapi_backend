@@ -7,10 +7,6 @@ from app.core.database import get_db
 
 router = APIRouter(tags=["Doctors"])
 
-@router.post("/doctor")
-def create_doctor(doctor:DoctorCreate, db: Session = Depends(get_db)):
-    return doctor_service.create_doctor(db,doctor)
-
 @router.get("/doctor", response_model=list[DoctorResponse])
 def get_all_doctors(db: Session = Depends(get_db)):
     return doctor_service.get(db)

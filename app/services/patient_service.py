@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session # type: ignore
 from app.models.patient_models import Patient as PatientDB   # SQLAlchemy model
 from app.schemas.patients import PatientCreate, PatientUpdate
 
-def view(db: Session)->list[PatientDB]:
+def view(db: Session,doctor_id:int)->list[PatientDB]:
     """Return a list of all patients from the database.
 
     Args:
@@ -13,9 +13,9 @@ def view(db: Session)->list[PatientDB]:
     Returns:
         PatientDB: Patients record if found.
     """
-    return db.query(PatientDB).all()
+    return db.query(PatientDB).filter(PatientDB.doctor_id == doctor_id).all()
 
-def view_patient(db: Session, patient_id: str)->PatientDB:
+def view_patient(db: Session, patient_id: str,doctor_id:int)->PatientDB:
     
     """
     Retrieve a single patient's details by their unique ID.
@@ -30,12 +30,12 @@ def view_patient(db: Session, patient_id: str)->PatientDB:
     Raises:
         HTTPException: 404 if patient is not found.
     """
-    patient = db.query(PatientDB).filter(PatientDB.id == patient_id).first()
+    patient = db.query(PatientDB).filter(PatientDB.id == patient_id, PatientDB.doctor_id == doctor_id).first()
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found!")
     return patient
 
-def sorted_patients(db: Session, sort_by: str, order: str)->list[PatientDB]:
+def sorted_patients(db: Session, sort_by: str, order: str,doctor_id:int)->list[PatientDB]:
     """
     Retrieve patients sorted by a specified field and order.
 
@@ -56,15 +56,12 @@ def sorted_patients(db: Session, sort_by: str, order: str)->list[PatientDB]:
     if order not in ["asc", "desc"]:
         raise HTTPException(status_code=400, detail="Invalid order. Use asc or desc")
 
-    query = db.query(PatientDB)
     column = getattr(PatientDB, sort_by)
-    if order == "desc":
-        query = query.order_by(column.desc())
-    else:
-        query = query.order_by(column.asc())
+    query = db.query(PatientDB).filter(PatientDB.doctor_id == doctor_id)
+    query = query.order_by(column.desc() if order == "desc" else column.asc())
     return query.all()
 
-def create_patient(db: Session, patient: PatientCreate)->dict:
+def create_patient(db: Session, patient: PatientCreate,doctor_id:int)->dict:
     """
     Create a new patient record.
 
@@ -80,7 +77,7 @@ def create_patient(db: Session, patient: PatientCreate)->dict:
         HTTPException: 400 if a patient with the same ID already exists.
     """
     # Check if patient already exists
-    existing = db.query(PatientDB).filter(PatientDB.id == patient.id).first()
+    existing = db.query(PatientDB).filter(PatientDB.id == patient.id, PatientDB.doctor_id == doctor_id).first()
     if existing:
         raise HTTPException(status_code=400, detail="Patient already exists!")
 
@@ -93,15 +90,15 @@ def create_patient(db: Session, patient: PatientCreate)->dict:
         height=patient.height,
         weight=patient.weight,
         bmi=patient.bmi,            # computed_field se direct
-        verdict=patient.verdict,     # computed_field se direct
-        doctor_id = patient.doctor_id
+        verdict=patient.verdict,    # computed_field se direct
+        doctor_id = doctor_id
     )
     db.add(db_patient)
     db.commit()
     db.refresh(db_patient)
     return {"message": "Patient created successfully"}
 
-def update_patient(db: Session, patient_id: str, patient: PatientUpdate)->dict:
+def update_patient(db: Session, patient_id: str, patient: PatientUpdate,doctor_id:int)->dict:
     """
     Update an existing patient's details.
 
@@ -117,7 +114,7 @@ def update_patient(db: Session, patient_id: str, patient: PatientUpdate)->dict:
     Raises:
         HTTPException: 404 if patient is not found.
     """
-    db_patient = db.query(PatientDB).filter(PatientDB.id == patient_id).first()
+    db_patient = db.query(PatientDB).filter(PatientDB.id == patient_id, PatientDB.doctor_id ==doctor_id).first()
     if not db_patient:
         raise HTTPException(status_code=404, detail="Patient not found!")
 
@@ -139,7 +136,7 @@ def update_patient(db: Session, patient_id: str, patient: PatientUpdate)->dict:
     db.refresh(db_patient)
     return {"message": "Patient updated successfully"}
 
-def patient_delete(db: Session, patient_id: str)->JSONResponse:
+def patient_delete(db: Session, patient_id: str,doctor_id:int)->JSONResponse:
     """
     Delete a patient record by ID.
 
@@ -153,7 +150,7 @@ def patient_delete(db: Session, patient_id: str)->JSONResponse:
     Raises:
         HTTPException: 404 if patient is not found.
     """
-    db_patient = db.query(PatientDB).filter(PatientDB.id == patient_id).first()
+    db_patient = db.query(PatientDB).filter(PatientDB.id == patient_id,PatientDB.doctor_id == doctor_id).first()
     if not db_patient:
         raise HTTPException(status_code=404, detail="Patient not found!")
     db.delete(db_patient)
