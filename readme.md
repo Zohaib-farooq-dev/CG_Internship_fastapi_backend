@@ -74,6 +74,4 @@ alembic revision --autogenerate -m "Create/Alter table"
 uvicorn app.main:app --reload
 ```
 After running the application, visit at following url to explore Swagger UI.
-```
 http://127.0.0.1:8000/docs
-```
