@@ -16,12 +16,14 @@ A simple **FastAPI** application connected to a **SQLite** database using **SQLA
 ## Project Structure
 ```
 ├─ app/
-│ ├─ core/ # Database & settings
-│ ├─ models/ # SQLAlchemy models (Doctor, Patient, Department, etc.)
-│ ├─ routers/ # API endpoints
-│ └─ main.py # FastAPI entry point
-├─ alembic/ # Migration scripts
-├─ patients.db # SQLite database (ignored by git)
+│  ├─ core/        # Database & settings
+│  ├─ models/      # SQLAlchemy models (Doctor, Patient, Department, etc.)
+│  ├─ routers/     # API endpoints
+│  ├─ schemas/     # Pydantic schemas (request/response models)
+│  ├─ services/    # Business logic & service layer
+│  └─ main.py      # FastAPI entry point
+├─ alembic/        # Migration scripts
+├─ patients.db     # SQLite database (ignored by git)
 ├─ alembic.ini
 ├─ requirements.txt
 └─ README.md
