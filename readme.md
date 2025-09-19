@@ -14,6 +14,7 @@ A simple **FastAPI** application connected to a **SQLite** database using **SQLA
 ---
 
 ## Project Structure
+```
 ├─ app/
 │ ├─ core/ # Database & settings
 │ ├─ models/ # SQLAlchemy models (Doctor, Patient, Department, etc.)
@@ -24,6 +25,7 @@ A simple **FastAPI** application connected to a **SQLite** database using **SQLA
 ├─ alembic.ini
 ├─ requirements.txt
 └─ README.md
+```
 
 ---
 
