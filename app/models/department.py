@@ -1,3 +1,9 @@
+"""
+Database models for department records.
+
+Defines the department ORM model representing the 'departments' table,
+including columns for department_name, location and no_of_doctors
+"""
 from sqlalchemy import Column, Integer, String # type: ignore
 from sqlalchemy.orm import relationship # type: ignore
 from app.core.database import Base

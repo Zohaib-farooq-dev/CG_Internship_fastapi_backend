@@ -1,3 +1,15 @@
+"""
+Pydantic models for doctors data validation and API I/O schemas.
+
+This module defines:
+- DoctorBase: Full doctor schema with validation, and field validator.
+- DoctorCreate: Schema for creating doctor records.
+- DoctorLogin: Schema for login doctor
+- DoctorResponse: Schema for response which tells the API to in which form to response.
+
+These models ensure strict type checking, input validation, and automatic 
+calculation of derived attributes when used in FastAPI endpoints.
+"""
 from pydantic import BaseModel, EmailStr, field_validator
 from .patients import PatientBase
 from typing import List

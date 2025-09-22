@@ -2,7 +2,7 @@
 FastAPI application entry point.
 
 Initializes the app, creates database tables at startup using the lifespan
-context, and registers the patient API router.
+context, and registers the patient, doctor, and auth routers.
 """
 from contextlib import asynccontextmanager
 from fastapi import FastAPI

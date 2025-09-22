@@ -12,6 +12,24 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/signup")
 def signup(doctor : DoctorCreate,db: Session = Depends(get_db) ):
+    """
+    Register a new doctor account.
+
+    Checks if the provided email is already registered.  
+    If unique, creates a new `Doctor` record in the database.
+
+    Args:
+        doctor (DoctorCreate): Pydantic schema containing
+            name, email, and password for the new doctor.
+        db (Session): SQLAlchemy database session (provided by dependency).
+
+    Raises:
+        HTTPException (400): If the email is already in use.
+
+    Returns:
+        dict: Confirmation message after successful creation.
+              Example: {"msg": "Doctor created"}
+    """
     if db.query(Doctor).filter(Doctor.email == doctor.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
     doctor = create_doctor(db, doctor) 
@@ -20,6 +38,30 @@ def signup(doctor : DoctorCreate,db: Session = Depends(get_db) ):
 
 @router.post("/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """
+    Authenticate a doctor and return a JWT access token.
+
+    Uses OAuth2 password flow.  
+    Validates the provided email (received as `username`) and password.
+    On success, generates a signed JWT containing the doctor's ID
+    in the `"sub"` (subject) claim.
+
+    Args:
+        form_data (OAuth2PasswordRequestForm): Parsed login form with
+            `username` (doctor email) and `password`.
+        db (Session): SQLAlchemy database session.
+
+    Raises:
+        HTTPException (401): If email does not exist or password is invalid.
+
+    Returns:
+        dict: Access token and token type for Bearer authentication.
+              Example:
+              {
+                  "access_token": "<jwt_token>",
+                  "token_type": "bearer"
+              }
+    """
     # form_data.username will contain the email
     doctor = db.query(Doctor).filter(Doctor.email == form_data.username).first()
     if not doctor or not verify_password(form_data.password, doctor.password):
