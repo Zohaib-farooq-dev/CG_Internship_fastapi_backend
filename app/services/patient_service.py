@@ -1,8 +1,10 @@
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session # type: ignore
-from app.models.patient_models import Patient as PatientDB   # SQLAlchemy model
+from app.models.patient_models import Patient as PatientDB
+from app.models.doctor_models import Doctor as DoctorDB    # SQLAlchemy model
 from app.schemas.patients import PatientCreate, PatientUpdate
+from app.services.celery_task import send_patient_created_email
 
 def view(db: Session,doctor_id:int)->list[PatientDB]:
     """Return a list of all patients from the database.
@@ -96,6 +98,9 @@ def create_patient(db: Session, patient: PatientCreate,doctor_id:int)->dict:
     db.add(db_patient)
     db.commit()
     db.refresh(db_patient)
+    doctor = db.query(DoctorDB).filter(DoctorDB.id == doctor_id).first()
+    if doctor:
+        send_patient_created_email.delay(doctor.email, db_patient.id)
     return {"message": "Patient created successfully"}
 
 def update_patient(db: Session, patient_id: str, patient: PatientUpdate,doctor_id:int)->dict:

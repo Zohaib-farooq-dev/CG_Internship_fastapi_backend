@@ -19,6 +19,8 @@ def hash_password(password: str):
     Returns:
         str: Secure bcrypt hash of the password.
     """
+    print("Password received:", repr(password))
+
     return pwd_context.hash(password)
 
 def verify_password(plain: str, hashed: str):

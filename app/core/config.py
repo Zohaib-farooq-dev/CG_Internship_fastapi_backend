@@ -8,6 +8,9 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     DATABASE_URL: str # default local sqlite
+    REDIS_URL: str
+    SMTP_USER: str
+    SMTP_PASS: str
     class Config:
         env_file = ".env"
 
