@@ -4,7 +4,7 @@ from email.mime.text import MIMEText
 import os
 
 @celery_app.task
-def send_patient_created_email(doctor_email: str, patient_id: int):
+def send_patient_created_email(doctor_email: str, patient_id: str):
     print("invoking celery task email sending function")
     msg = MIMEText(f"A new patient (ID: {patient_id}) was created.")
     msg["Subject"] = "New Patient Created"

@@ -99,6 +99,8 @@ def create_patient(db: Session, patient: PatientCreate,doctor_id:int)->dict:
     db.commit()
     db.refresh(db_patient)
     doctor = db.query(DoctorDB).filter(DoctorDB.id == doctor_id).first()
+    print("Doctor email:", doctor.email)
+    print("Patient ID:", db_patient.id)
     if doctor:
         send_patient_created_email.delay(doctor.email, db_patient.id)
     return {"message": "Patient created successfully"}
